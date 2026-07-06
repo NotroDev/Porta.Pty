@@ -1,47 +1,186 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+﻿using System;
+using System.Runtime.InteropServices;
 
-namespace Porta.Pty.Windows
+namespace Porta.Pty.Windows;
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct COORD
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Vanara.PInvoke;
-    using static Vanara.PInvoke.Kernel32;
+    public short X;
+    public short Y;
+}
 
-    internal static class NativeMethods
+[StructLayout(LayoutKind.Sequential)]
+internal struct STARTUPINFOEX
+{
+    public STARTUPINFO StartupInfo;
+    public IntPtr lpAttributeList;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct STARTUPINFO
+{
+    public uint cb;
+    public IntPtr lpReserved;
+    public IntPtr lpDesktop;
+    public IntPtr lpTitle;
+    public uint dwX;
+    public uint dwY;
+    public uint dwXSize;
+    public uint dwYSize;
+    public uint dwXCountChars;
+    public uint dwYCountChars;
+    public uint dwFillAttribute;
+    public uint dwFlags;
+    public ushort wShowWindow;
+    public ushort cbReserved2;
+    public IntPtr lpReserved2;
+    public IntPtr hStdInput;
+    public IntPtr hStdOutput;
+    public IntPtr hStdError;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct PROCESS_INFORMATION
+{
+    public IntPtr hProcess;
+    public IntPtr hThread;
+    public uint dwProcessId;
+    public uint dwThreadId;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct JOBOBJECT_BASIC_LIMIT_INFORMATION
+{
+    public long PerProcessUserTimeLimit;
+    public long PerJobUserTimeLimit;
+    public uint LimitFlags;
+    public nuint MinimumWorkingSetSize;
+    public nuint MaximumWorkingSetSize;
+    public uint ActiveProcessLimit;
+    public nuint Affinity;
+    public uint PriorityClass;
+    public uint SchedulingClass;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct IO_COUNTERS
+{
+    public ulong ReadOperationCount;
+    public ulong WriteOperationCount;
+    public ulong OtherOperationCount;
+    public ulong ReadTransferCount;
+    public ulong WriteTransferCount;
+    public ulong OtherTransferCount;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+{
+    public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
+    public IO_COUNTERS IoInfo;
+    public nuint ProcessMemoryLimit;
+    public nuint JobMemoryLimit;
+    public nuint PeakProcessMemoryUsed;
+    public nuint PeakJobMemoryUsed;
+}
+
+internal static partial class NativeMethods
+{
+    public const int S_OK = 0;
+    private const int PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE = 0x20016;
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool InitializeProcThreadAttributeList(
+        IntPtr lpAttributeList,
+        int dwAttributeCount,
+        uint dwFlags,
+        ref nint lpSize);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UpdateProcThreadAttribute(
+        IntPtr lpAttributeList,
+        uint dwFlags,
+        IntPtr Attribute,
+        IntPtr lpValue,
+        nint cbSize,
+        IntPtr lpPreviousValue,
+        IntPtr lpReturnSize);
+
+    [LibraryImport("kernel32.dll")]
+    public static partial void DeleteProcThreadAttributeList(IntPtr lpAttributeList);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CloseHandle(IntPtr hObject);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CreatePipe(
+        out IntPtr hReadPipe,
+        out IntPtr hWritePipe,
+        IntPtr lpPipeAttributes,
+        uint nSize);
+
+    [LibraryImport("kernel32.dll")]
+    public static partial int CreatePseudoConsole(
+        COORD size,
+        IntPtr hInput,
+        IntPtr hOutput,
+        uint dwFlags,
+        out IntPtr phpc);
+
+    [LibraryImport("kernel32.dll")]
+    public static partial int ResizePseudoConsole(IntPtr hPC, COORD size);
+
+    [LibraryImport("kernel32.dll")]
+    public static partial void ClosePseudoConsole(IntPtr hPC);
+
+    [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+    public static partial IntPtr CreateJobObjectW(IntPtr lpJobAttributes, string? lpName);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetInformationJobObject(
+        IntPtr hJob,
+        int JobObjectInformationClass,
+        ref JOBOBJECT_EXTENDED_LIMIT_INFORMATION lpJobObjectInformation,
+        uint cbJobObjectInformationLength);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AssignProcessToJobObject(IntPtr hJob, IntPtr hProcess);
+
+    [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CreateProcessW(
+        string? lpApplicationName,
+        IntPtr lpCommandLine,
+        IntPtr lpProcessAttributes,
+        IntPtr lpThreadAttributes,
+        [MarshalAs(UnmanagedType.Bool)] bool bInheritHandles,
+        uint dwCreationFlags,
+        IntPtr lpEnvironment,
+        string? lpCurrentDirectory,
+        ref STARTUPINFOEX lpStartupInfo,
+        out PROCESS_INFORMATION lpProcessInformation);
+
+    extension(ref STARTUPINFOEX startupInfo)
     {
-        public const int S_OK = 0;
-
-        // PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE value
-        // This is ProcThreadAttributePseudoConsole (22) | PROC_THREAD_ATTRIBUTE_INPUT (0x20000)
-        private const int PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE = 0x20016; // 22 | 0x20000
-
-        private static readonly Lazy<bool> IsPseudoConsoleSupportedLazy = new Lazy<bool>(
-            () =>
-            {
-                var hLibrary = LoadLibrary("kernel32.dll");
-                return !hLibrary.IsInvalid && GetProcAddress(hLibrary, "CreatePseudoConsole") != IntPtr.Zero;
-            },
-            isThreadSafe: true);
-
-        internal static bool IsPseudoConsoleSupported => IsPseudoConsoleSupportedLazy.Value;
-
-        // Extension method to initialize STARTUPINFOEX with PseudoConsole attribute
-        internal static void InitAttributeListAttachedToConPTY(ref this STARTUPINFOEX startupInfo, SafeHPCON pseudoConsoleHandle)
+         internal void InitAttributeListAttachedToConPTY(IntPtr pseudoConsoleHandle)
         {
             startupInfo.StartupInfo.cb = (uint)Marshal.SizeOf<STARTUPINFOEX>();
-            startupInfo.StartupInfo.dwFlags = STARTF.STARTF_USESTDHANDLES;
+            startupInfo.StartupInfo.dwFlags = 0x00000100; // STARTF_USESTDHANDLES
 
-            const int AttributeCount = 1;
-            SizeT size = SizeT.Zero;
+            const int attributeCount = 1;
+            nint size = 0;
 
-            // Create the appropriately sized thread attribute list
-            bool wasInitialized = InitializeProcThreadAttributeList(IntPtr.Zero, AttributeCount, 0, ref size);
-            if (wasInitialized || size == SizeT.Zero)
+            InitializeProcThreadAttributeList(IntPtr.Zero, attributeCount, 0, ref size);
+            if (size == 0)
             {
-                throw new InvalidOperationException(
-                    $"Couldn't get the size of the process attribute list for {AttributeCount} attributes",
-                    new System.ComponentModel.Win32Exception());
+                throw new InvalidOperationException("Couldn't get size of process attribute list", new System.ComponentModel.Win32Exception());
             }
 
             startupInfo.lpAttributeList = Marshal.AllocHGlobal((int)size);
@@ -50,23 +189,17 @@ namespace Porta.Pty.Windows
                 throw new OutOfMemoryException("Couldn't reserve space for a new process attribute list");
             }
 
-            // Set startup info's attribute list & initialize it
-            wasInitialized = InitializeProcThreadAttributeList(startupInfo.lpAttributeList, AttributeCount, 0, ref size);
-            if (!wasInitialized)
+            if (!InitializeProcThreadAttributeList(startupInfo.lpAttributeList, attributeCount, 0, ref size))
             {
                 throw new InvalidOperationException("Couldn't create new process attribute list", new System.ComponentModel.Win32Exception());
             }
 
-            // Set thread attribute list's Pseudo Console to the specified ConPTY
-            // Note: We use our own P/Invoke for UpdateProcThreadAttribute because:
-            // 1. Vanara's PROC_THREAD_ATTRIBUTE enum doesn't include PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE (newer Win10 feature)
-            // 2. Vanara's UpdateProcThreadAttribute doesn't accept IntPtr for custom attribute values
-            wasInitialized = UpdateProcThreadAttributeCustom(
+            bool wasInitialized = UpdateProcThreadAttribute(
                 startupInfo.lpAttributeList,
                 0,
-                new IntPtr(PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE),
-                pseudoConsoleHandle.DangerousGetHandle(),
-                (SizeT)Marshal.SizeOf<IntPtr>(),
+                PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+                pseudoConsoleHandle,
+                Marshal.SizeOf<IntPtr>(),
                 IntPtr.Zero,
                 IntPtr.Zero);
 
@@ -76,7 +209,7 @@ namespace Porta.Pty.Windows
             }
         }
 
-        internal static void FreeAttributeList(ref this STARTUPINFOEX startupInfo)
+        internal void FreeAttributeList()
         {
             if (startupInfo.lpAttributeList != IntPtr.Zero)
             {
@@ -85,21 +218,5 @@ namespace Porta.Pty.Windows
                 startupInfo.lpAttributeList = IntPtr.Zero;
             }
         }
-
-        /// <summary>
-        /// Custom P/Invoke for UpdateProcThreadAttribute.
-        /// Required because Vanara's version doesn't support PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
-        /// which is a newer Windows 10 feature not yet in Vanara's PROC_THREAD_ATTRIBUTE enum.
-        /// </summary>
-        [DllImport("kernel32.dll", EntryPoint = "UpdateProcThreadAttribute", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UpdateProcThreadAttributeCustom(
-            IntPtr lpAttributeList,
-            uint dwFlags,
-            IntPtr Attribute,
-            IntPtr lpValue,
-            SizeT cbSize,
-            IntPtr lpPreviousValue,
-            IntPtr lpReturnSize);
     }
 }
