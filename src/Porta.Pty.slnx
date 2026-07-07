@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Porta.Pty.Tests/Porta.Pty.Tests.csproj" />
+  <Project Path="Porta.Pty/Porta.Pty.csproj" />
+</Solution>
