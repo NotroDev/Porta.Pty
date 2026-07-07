@@ -37,7 +37,7 @@ jobs:
       run: |
         # Copy to a location the runtime can find for tests
         cp src/Porta.Pty.Native/output/runtimes/linux-x64/native/libporta_pty.so \
-           src/Porta.Pty.Tests/bin/Debug/net6.0/ || true
+           src/Porta.Pty.Tests/bin/Debug/net10.0/ || true
 
     - name: Test
       run: dotnet test --no-build --verbosity normal src/Porta.Pty.slnx

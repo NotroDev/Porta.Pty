@@ -42,7 +42,7 @@ jobs:
         RID=${{ steps.rid.outputs.rid }}
         # Copy to a location the runtime can find for tests
         cp src/Porta.Pty.Native/output/runtimes/${RID}/native/libporta_pty.dylib \
-           src/Porta.Pty.Tests/bin/Debug/net6.0/ || true
+           src/Porta.Pty.Tests/bin/Debug/net10.0/ || true
 
     - name: Test
       run: dotnet test --no-build --verbosity normal src/Porta.Pty.slnx
