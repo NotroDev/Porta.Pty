@@ -138,10 +138,8 @@ jobs:
           echo "Package contents:"
           unzip -l packages/*.nupkg | grep -E "(runtimes|\.so|\.dylib)"
 
-      - name: Publish NuGet and symbols
-        id: nuget-push
-        uses: edumserrano/nuget-push@v1
-        with:
-          api-key: '${{ secrets.NUGET_KEY }}' 
-          working-directory: 'packages'
-          fail-if-exists: false
+      - name: Upload compiled NuGet package as artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: Porta.Pty-Package
+            path: packages/*
