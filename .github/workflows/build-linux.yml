@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Porta.Pty.sln
+    - name: Checkout Porta.Pty.slnx
       uses: actions/checkout@v4
 
     - name: Setup .NET
@@ -39,10 +39,10 @@ jobs:
         ./build.sh
 
     - name: Restore dependencies
-      run: dotnet restore src/Porta.Pty.sln
+      run: dotnet restore src/Porta.Pty.slnx
 
     - name: Build
-      run: dotnet build --no-restore src/Porta.Pty.sln --property WarningLevel=0
+      run: dotnet build --no-restore src/Porta.Pty.slnx --property WarningLevel=0
       
     - name: Copy native library for tests
       run: |
@@ -51,4 +51,4 @@ jobs:
            src/Porta.Pty.Tests/bin/Debug/net6.0/ || true
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal src/Porta.Pty.sln
+      run: dotnet test --no-build --verbosity normal src/Porta.Pty.slnx

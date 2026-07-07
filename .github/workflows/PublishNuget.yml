@@ -124,14 +124,14 @@ jobs:
           find src/Porta.Pty.Native/output/runtimes -type f -name "*.so" -o -name "*.dylib"
 
       - name: Restore dependencies
-        run: dotnet restore src/Porta.Pty.sln
+        run: dotnet restore src/Porta.Pty.slnx
 
       - name: Build
-        run: dotnet build src/Porta.Pty.sln -c Release --no-restore 
+        run: dotnet build src/Porta.Pty.slnx -c Release --no-restore 
   
       - name: dotnet pack 
         run: |
-          dotnet pack --no-build src/Porta.Pty.sln -c Release -o packages --include-symbols --property WarningLevel=0
+          dotnet pack --no-build src/Porta.Pty.slnx -c Release -o packages --include-symbols --property WarningLevel=0
 
       - name: List package contents
         run: |
