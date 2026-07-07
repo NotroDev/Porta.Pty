@@ -85,38 +85,38 @@ jobs:
       - build-native-linux-arm64
       - build-native-macos
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v4
-  
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
+      
       # Download all native libraries
       - name: Download Linux x64 native library
         uses: actions/download-artifact@v4
         with:
           name: native-linux-x64
-          path: src/Porta.Pty.Native/output/runtimes/linux-x64/native/
+          path: .
 
       - name: Download Linux ARM64 native library
         uses: actions/download-artifact@v4
         with:
           name: native-linux-arm64
-          path: src/Porta.Pty.Native/output/runtimes/linux-arm64/native/
+          path: .
 
       - name: Download macOS ARM64 native library
         uses: actions/download-artifact@v4
         with:
           name: native-osx-arm64
-          path: src/Porta.Pty.Native/output/runtimes/osx-arm64/native/
+          path: .
 
       - name: Download macOS x64 native library
         uses: actions/download-artifact@v4
         with:
           name: native-osx-x64
-          path: src/Porta.Pty.Native/output/runtimes/osx-x64/native/
+          path: .
 
       - name: List native libraries
         run: |
@@ -127,9 +127,9 @@ jobs:
         run: dotnet restore src/Porta.Pty.slnx
 
       - name: Build
-        run: dotnet build src/Porta.Pty.slnx -c Release --no-restore 
-  
-      - name: dotnet pack 
+        run: dotnet build src/Porta.Pty.slnx -c Release --no-restore
+
+      - name: dotnet pack
         run: |
           dotnet pack --no-build src/Porta.Pty.slnx -c Release -o packages --include-symbols --property WarningLevel=0
 
