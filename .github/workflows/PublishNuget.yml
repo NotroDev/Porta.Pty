@@ -136,7 +136,11 @@ jobs:
       - name: List package contents
         run: |
           echo "Package contents:"
-          unzip -l packages/*.nupkg | grep -E "(runtimes|\.so|\.dylib)"
+          for f in packages/*.nupkg; do
+            if [[ "$f" != *".symbols.nupkg" ]]; then
+              unzip -l "$f" | grep -E "(runtimes|\.so|\.dylib)"
+            fi
+          done
 
       - name: Upload compiled NuGet package as artifact
         uses: actions/upload-artifact@v4
