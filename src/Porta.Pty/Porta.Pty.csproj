@@ -14,39 +14,27 @@
     <!-- These are built from src/Porta.Pty.Native and placed in the runtimes folder -->
     <ItemGroup>
         <!-- Linux x64 -->
-        <None Include="$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/linux-x64/native/libporta_pty.so"
+        <None Include="$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/linux-x64/native/libporta_pty.so"
               Pack="true"
-              PackagePath="runtimes/linux-x64/native/"
-              CopyToOutputDirectory="PreserveNewest"
-              CopyToPublishDirectory="PreserveNewest"
-              Link="libporta_pty.so"
-              Condition="Exists('$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/linux-x64/native/libporta_pty.so')" />
+              PackagePath="runtimes/linux-x64/native/libporta_pty.so"
+              Condition="Exists('$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/linux-x64/native/libporta_pty.so')" />
 
         <!-- Linux arm64 -->
-        <None Include="$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/linux-arm64/native/libporta_pty.so"
+        <None Include="$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/linux-arm64/native/libporta_pty.so"
               Pack="true"
-              PackagePath="runtimes/linux-arm64/native/"
-              CopyToOutputDirectory="PreserveNewest"
-              CopyToPublishDirectory="PreserveNewest"
-              Link="libporta_pty.so"
-              Condition="Exists('$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/linux-arm64/native/libporta_pty.so')" />
+              PackagePath="runtimes/linux-arm64/native/libporta_pty.so"
+              Condition="Exists('$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/linux-arm64/native/libporta_pty.so')" />
 
         <!-- OSX x64 -->
-        <None Include="$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/osx-x64/native/libporta_pty.dylib"
+        <None Include="$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/osx-x64/native/libporta_pty.dylib"
               Pack="true"
-              PackagePath="runtimes/osx-x64/native/"
-              CopyToOutputDirectory="PreserveNewest"
-              CopyToPublishDirectory="PreserveNewest"
-              Link="libporta_pty.dylib"
-              Condition="Exists('$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/osx-x64/native/libporta_pty.dylib')" />
+              PackagePath="runtimes/osx-x64/native/libporta_pty.dylib"
+              Condition="Exists('$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/osx-x64/native/libporta_pty.dylib')" />
 
         <!-- OSX arm64 -->
-        <None Include="$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/osx-arm64/native/libporta_pty.dylib"
+        <None Include="$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/osx-arm64/native/libporta_pty.dylib"
               Pack="true"
-              PackagePath="runtimes/osx-arm64/native/"
-              CopyToOutputDirectory="PreserveNewest"
-              CopyToPublishDirectory="PreserveNewest"
-              Link="libporta_pty.dylib"
-              Condition="Exists('$(MSBuildProjectDirectory)/../Porta.Pty.Native/output/runtimes/osx-arm64/native/libporta_pty.dylib')" />
+              PackagePath="runtimes/osx-arm64/native/libporta_pty.dylib"
+              Condition="Exists('$(MSBuildThisFileDirectory)../Porta.Pty.Native/output/runtimes/osx-arm64/native/libporta_pty.dylib')" />
     </ItemGroup>
 </Project>
