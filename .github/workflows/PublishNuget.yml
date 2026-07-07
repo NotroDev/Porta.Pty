@@ -139,7 +139,7 @@ jobs:
           unzip -l packages/*.nupkg | grep -E "(runtimes|\.so|\.dylib)"
 
       - name: Upload compiled NuGet package as artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: Porta.Pty-Package
-            path: packages/*
+        uses: actions/upload-artifact@v4
+        with:
+          name: Porta.Pty-Package
+          path: packages/*
